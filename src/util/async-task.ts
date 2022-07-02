@@ -1,7 +1,7 @@
 import { Worker, workerData, isMainThread, parentPort } from "worker_threads";
 
 export default class AsyncTask<T extends (...args: any[]) => any> {
-  constructor(private task: T) {
+  constructor(private task: T, private filename: string) {
     if (!isMainThread) {
       try {
         const result = this.task(...workerData);
@@ -22,14 +22,18 @@ export default class AsyncTask<T extends (...args: any[]) => any> {
     }
   }
 
-  public async run(...args: Parameters<T>): Promise<ReturnType<T>> {
-    const worker = new Worker(__filename, {
+  public async run(
+    ...args: Parameters<T>
+  ): Promise<ReturnType<T> extends Promise<infer R> ? R : ReturnType<T>> {
+    const worker = new Worker(this.filename, {
       workerData: [...args],
-      execArgv: __filename.endsWith(".ts")
+      execArgv: this.filename.endsWith(".ts")
         ? ["-r", "ts-node/register/transpile-only"]
         : undefined,
     });
-    return new Promise<ReturnType<T>>((resolve, reject) => {
+    return new Promise<
+      ReturnType<T> extends Promise<infer R> ? R : ReturnType<T>
+    >((resolve, reject) => {
       worker.on("message", (message: { err: any } | { result: any }) => {
         worker.terminate().then(() => {
           if ("err" in message) reject(message.err);

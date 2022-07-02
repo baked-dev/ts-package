@@ -34,7 +34,7 @@ export const swcbuild = async (
   }
   return files
     .map(async (file) => {
-      transformFile(file, {
+      return transformFile(file, {
         ...config,
         sourceMaps: true,
       }).then(({ code, map }) => [

@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node
 
 import { JscConfig, JscTarget } from "@swc/core";
 import { join } from "path";
@@ -7,7 +7,8 @@ import "./util/async-array";
 import {
   BuildConfig,
   BuildFormatConfig,
-  defaultFormats,
+  FullConfig,
+  normalizeConfig,
   read,
 } from "./util/config";
 import { clear, sharedBase } from "./util/fs";
@@ -15,14 +16,7 @@ import { globs } from "./util/glob";
 import { swcbuild } from "./util/swc-build";
 import { loadTsconfig, tsbuild } from "./util/typescript";
 
-export type { BuildConfig, BuildFormatConfig };
-
-const defaultJsc: JscConfig = {
-  parser: {
-    syntax: "typescript",
-    dynamicImport: true,
-  },
-};
+export type { BuildConfig, BuildFormatConfig, FullConfig };
 
 const buildFormat = async (
   name: string,
@@ -91,17 +85,17 @@ const buildFormat = async (
 
 const build = async ({
   out: userOut,
-  tsconfigPath: userTsconfigPath,
-  sourcemaps = true,
-  types = true,
-  formats = defaultFormats,
-  jsc = defaultJsc,
-}: BuildConfig) => {
+  tsconfigPath,
+  sourcemaps,
+  types,
+  formats,
+  jsc,
+}: FullConfig) => {
   const [
     tsConfig,
     fileNames,
     { compilerOptions: { target = "es3" } = {} } = {},
-  ] = loadTsconfig(userTsconfigPath);
+  ] = loadTsconfig(tsconfigPath);
   const outDir = userOut || tsConfig.outDir;
   if (!outDir) throw new Error("Could not determine out directory.");
 
@@ -128,7 +122,9 @@ const build = async ({
 
 const main = async (configPath?: string) => {
   const config = await read(configPath);
-  await build(config);
+  const fullConfig = normalizeConfig(config);
+  console.log(fullConfig);
+  await build(fullConfig);
 };
 
 main(...process.argv.slice(2));

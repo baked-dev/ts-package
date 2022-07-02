@@ -1,5 +1,5 @@
 import { mkdir, readdir, remove, stat, writeFile } from "fs-extra";
-import { join, sep } from "path";
+import { join, normalize, sep } from "path";
 import "./async-array";
 
 export const clear = async (dir: string) => {
@@ -22,7 +22,7 @@ export const exists = async (file: string) => {
 };
 
 export const safeWrite = async (path: string, data: any) => {
-  const parts = path.split(sep);
+  const parts = normalize(path).split(sep);
   const filename = parts.pop();
   if (!(await exists(join(...parts))))
     await mkdir(join(...parts), { recursive: true });
@@ -32,7 +32,8 @@ export const safeWrite = async (path: string, data: any) => {
 export const sharedBase = (files: string[]) => {
   return join(
     ...files.reduce((acc: string[], file) => {
-      const parts = file.split("/");
+      const parts = normalize(file).split(sep);
+      parts.pop();
       if (!acc.length) return parts;
       const matches: string[] = [];
       for (const idx in parts) {

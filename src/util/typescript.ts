@@ -17,8 +17,11 @@ export const loadTsconfig = (
   return [options, fileNames, config];
 };
 
-export const tsbuild = new AsyncTask(
+const buildTask = new AsyncTask(
   async (files: string[], config: CompilerOptions) => {
     createProgram(files, config).emit();
-  }
-).run;
+  },
+  __filename
+);
+
+export const tsbuild = buildTask.run.bind(buildTask);

@@ -1,7 +1,7 @@
 import type { BuildConfig } from "./src/build";
 
 const config: BuildConfig = {
-  out: "dist2",
+  out: "dist",
 };
 
 export default config;
