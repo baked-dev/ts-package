@@ -12,6 +12,9 @@
   "keywords": [],
   "author": "baked-dev",
   "license": "ISC",
+  "scripts": {
+    "prepublishOnly": "ts-node ./src/build.ts"
+  },
   "devDependencies": {
     "@types/fs-extra": "^9.0.13",
     "@types/glob": "^7.2.0",
@@ -24,8 +27,8 @@
     "typescript": "^4.7.4",
     "ts-node": "^10.8.1"
   },
-  "repository": "https://github.com/baked-dev/ts-publish",
-  "readme": "https://github.com/baked-dev/ts-publish#readme",
+  "repository": "https://github.com/baked-dev/ts-package",
+  "readme": "https://github.com/baked-dev/ts-package#readme",
   "private": false,
   "exports": {
     "import": "./dist/esm/build.mjs",
